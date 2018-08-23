@@ -2,18 +2,15 @@ package com.telefonica.portalmiddleware.service;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.codec.Charsets;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpHost;
-import org.apache.http.client.config.AuthSchemes;
-import org.apache.http.client.config.CookieSpecs;
-import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -24,33 +21,20 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public abstract class BaseService {
 	protected String endPoint;
 	protected String uri;
 	protected String method;
-	private @Value("${baseService.timeout}") int timeout;
-	private @Value("${baseService.proxyPort}") int proxyPort;
-	private @Value("${baseService.proxyHost}") String proxyHost;
-	private RequestConfig requestConfig;
+	@Autowired
+	protected BaseConfigurationService baseConfiguration;
 	private String jsonEntity;
-	private Map<String, String> headers=new HashMap<String, String>();
-	private Map<String, String> parameters=new HashMap<String, String>();
-	public BaseService(){
-		RequestConfig defaultRequestConfig = RequestConfig.custom()
-	            .setCookieSpec(CookieSpecs.DEFAULT)
-	            .setExpectContinueEnabled(true)
-	            .setTargetPreferredAuthSchemes(Arrays.asList(AuthSchemes.NTLM, AuthSchemes.DIGEST))
-	            .setProxyPreferredAuthSchemes(Arrays.asList(AuthSchemes.BASIC))
-	            .build();
-		requestConfig = RequestConfig.copy(defaultRequestConfig)
-                .setSocketTimeout(timeout)
-                .setConnectTimeout(timeout)
-                .setConnectionRequestTimeout(timeout)
-                .setProxy(new HttpHost(proxyHost, proxyPort))
-                .build();
-	}
+	
+	protected Map<String, String> headers=new HashMap<String, String>();
+	protected Map<String, String> parameters=new HashMap<String, String>();
+	
+    private final Log LOG = LogFactory.getLog(getClass());
 	public JSONObject service()throws Throwable{
 		CloseableHttpClient httpClient=HttpClients.createDefault();
 		try{
@@ -63,15 +47,17 @@ public abstract class BaseService {
 				httpRequest=new HttpGet(builder.build());
 			}
 			if(HttpPost.METHOD_NAME.compareTo(method)==0){
-			    StringEntity entity = new StringEntity(jsonEntity);
 			    httpRequest=new HttpPost(builder.build());
-			    ((HttpPost)httpRequest).setEntity(entity);
+			    if(jsonEntity!=null){
+			    	StringEntity entity = new StringEntity(jsonEntity);
+				    ((HttpPost)httpRequest).setEntity(entity);	
+			    }
 			}
 			for(Entry<String, String> entity: headers.entrySet()){
 				httpRequest.setHeader(entity.getKey(), entity.getValue());
 			}
 			if(httpRequest!=null){
-				httpRequest.setConfig(requestConfig);
+				httpRequest.setConfig(baseConfiguration.getRequestConfig());
 			}
 			CloseableHttpResponse response=httpClient.execute(httpRequest);
 			HttpEntity entity = response.getEntity();
@@ -115,10 +101,6 @@ public abstract class BaseService {
 	}
 	
 	public abstract void setMethod(String method);
-	
-	public RequestConfig getRequestConfig() {
-		return requestConfig;
-	}
 	
 	public String getJsonEntity() {
 		return jsonEntity;

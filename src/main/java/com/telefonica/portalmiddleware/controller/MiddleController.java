@@ -1,6 +1,9 @@
 package com.telefonica.portalmiddleware.controller;
 
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.json.JSONObject;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
@@ -19,10 +22,14 @@ public class MiddleController extends BaseController {
 	private EventResponsysService eventResponsysService;
 	@Autowired
 	private MemberResponsysService memberResponsysService;
-	
+	private final Logger LOG = LogManager.getLogger(getClass());
 	@Scheduled(initialDelay=5000, fixedDelayString = "${schedule.fixedDelayString}")
 	public void renewTokenResponsys(){
-		System.out.println("MiddleController renewTokenResponsys");
+		LOG.trace("MiddleController debug");
+		LOG.debug("MiddleController debug");
+		LOG.info("MiddleController info");
+		LOG.error("MiddleController error");
+		LOG.fatal("MiddleController fatal");
 		try {
 			JSONObject jsonObject=tokenResponsysService.service();
 			tokenResponsys=jsonObject.getString("authToken");
@@ -33,8 +40,7 @@ public class MiddleController extends BaseController {
 			memberResponsysService.setEndPoint(endpointResponsys);
 			memberResponsysService.getHeaders().put("Authorization", tokenResponsys);
 		} catch (Throwable e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.error("Hubo un error al renovar el token de Responsys: ", e);
 		}
 	}
 
