@@ -8,9 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
 
-import com.telefonica.portalmiddleware.service.EventResponsysService;
-import com.telefonica.portalmiddleware.service.MemberResponsysService;
-import com.telefonica.portalmiddleware.service.TokenResponsysService;
+import com.telefonica.portalmiddleware.service.rest.EventResponsysService;
+import com.telefonica.portalmiddleware.service.rest.MemberResponsysService;
+import com.telefonica.portalmiddleware.service.rest.TokenResponsysService;
 
 @Controller
 public class MiddleController extends BaseController {
@@ -23,13 +23,10 @@ public class MiddleController extends BaseController {
 	@Autowired
 	private MemberResponsysService memberResponsysService;
 	private final Logger LOG = LogManager.getLogger(getClass());
+	
 	@Scheduled(initialDelay=5000, fixedDelayString = "${schedule.fixedDelayString}")
 	public void renewTokenResponsys(){
-		LOG.trace("MiddleController debug");
-		LOG.debug("MiddleController debug");
-		LOG.info("MiddleController info");
-		LOG.error("MiddleController error");
-		LOG.fatal("MiddleController fatal");
+		LOG.debug("MiddleController renewTokenResponsys");
 		try {
 			JSONObject jsonObject=tokenResponsysService.service();
 			tokenResponsys=jsonObject.getString("authToken");
