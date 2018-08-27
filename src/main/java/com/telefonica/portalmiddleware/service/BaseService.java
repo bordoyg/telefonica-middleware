@@ -3,8 +3,12 @@ package com.telefonica.portalmiddleware.service;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Properties;
+
+import javax.annotation.PostConstruct;
 
 import org.apache.commons.codec.Charsets;
 import org.apache.commons.logging.Log;
@@ -22,11 +26,18 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ApplicationContext;
 
 public abstract class BaseService {
 	protected String endPoint;
 	protected String uri;
 	protected String method;
+	@Autowired
+	private ApplicationContext appContext;
+	@Autowired
+	@Qualifier("propertyConfigurer")
+	private Properties portalMiddlewareProperties;
 	@Autowired
 	protected BaseConfigurationService baseConfiguration;
 	private String jsonEntity;
@@ -35,7 +46,47 @@ public abstract class BaseService {
 	protected Map<String, String> parameters=new HashMap<String, String>();
 	
     private final Log LOG = LogFactory.getLog(getClass());
+
+	@PostConstruct
+	public void init(){ 
+		
+		String[] beanNames=appContext.getBeanNamesForType(this.getClass());
+		for(String beanName:beanNames){
+			try{
+				String endPoint=portalMiddlewareProperties.getProperty(beanName + ".endPoint");
+				String uri=portalMiddlewareProperties.getProperty(beanName + ".uri");
+				String method=portalMiddlewareProperties.getProperty(beanName + ".method");
+				String parameters=portalMiddlewareProperties.getProperty(beanName + ".parameters");
+				String headers=portalMiddlewareProperties.getProperty(beanName + ".headers");
+	
+				try{
+					JSONObject jsonParameters=new JSONObject(parameters);
+					Iterator<String> nameItr = jsonParameters.keys();
+					while(nameItr.hasNext()) {
+					    String name = nameItr.next();
+					    this.getParameters().put(name, jsonParameters.getString(name));
+					}
+				}catch(Exception je){}
+				
+				try{
+					JSONObject jsonHeaders=new JSONObject(headers);
+					Iterator<String> nameItr = jsonHeaders.keys();
+					while(nameItr.hasNext()) {
+					    String name = nameItr.next();
+					    this.getHeaders().put(name, jsonHeaders.getString(name));
+					}
+				}catch(Exception je){}
+				
+				this.setEndPoint(endPoint);
+				this.setUri(uri);
+				this.setMethod(method);
+			}catch(Exception e){
+				LOG.debug("Hubo un error al levantar la configuracion");
+			}
+		}
+	}
 	public JSONObject service()throws Throwable{
+		
 		CloseableHttpClient httpClient=HttpClients.createDefault();
 		try{
 			HttpRequestBase httpRequest=null;
@@ -94,13 +145,17 @@ public abstract class BaseService {
 		return uri;
 	}
 	
-	public abstract void setUri(String uri);
+	public void setUri(String uri){
+		this.uri=uri;
+	}
 	
 	public String getMethod() {
 		return method;
 	}
 	
-	public abstract void setMethod(String method);
+	public void setMethod(String method){
+		this.method=method;
+	}
 	
 	public String getJsonEntity() {
 		return jsonEntity;
@@ -111,15 +166,11 @@ public abstract class BaseService {
 	public Map<String, String> getHeaders() {
 		return headers;
 	}
-	public void setHeaders(Map<String, String> headers) {
-		this.headers = headers;
-	}
+
 	public Map<String, String> getParameters() {
 		return parameters;
 	}
-	public void setParameters(Map<String, String> parameters) {
-		this.parameters = parameters;
-	}
+
 	public String getEndPoint() {
 		return endPoint;
 	}

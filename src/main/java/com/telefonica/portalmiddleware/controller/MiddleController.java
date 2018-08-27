@@ -1,5 +1,7 @@
 package com.telefonica.portalmiddleware.controller;
 
+import javax.annotation.PostConstruct;
+
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
@@ -23,13 +25,9 @@ public class MiddleController extends BaseController {
 	@Autowired
 	private MemberResponsysService memberResponsysService;
 	private final Logger LOG = LogManager.getLogger(getClass());
-	@Scheduled(initialDelay=5000, fixedDelayString = "${schedule.fixedDelayString}")
+	@Scheduled(cron = "${schedule.responsysToken.cron}")
 	public void renewTokenResponsys(){
-		LOG.trace("MiddleController debug");
-		LOG.debug("MiddleController debug");
-		LOG.info("MiddleController info");
-		LOG.error("MiddleController error");
-		LOG.fatal("MiddleController fatal");
+		LOG.debug("MiddleController renewTokenResponsys INICIO");
 		try {
 			JSONObject jsonObject=tokenResponsysService.service();
 			tokenResponsys=jsonObject.getString("authToken");
@@ -44,6 +42,10 @@ public class MiddleController extends BaseController {
 		}
 	}
 
-	
+
+	@PostConstruct
+	public void init(){ 
+		renewTokenResponsys();
+	}
 	
 }

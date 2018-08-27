@@ -98,7 +98,7 @@
 
     <service name="agent_service">
         <port binding="tns:agent_binding" name="agent_interface">
-            <soap:address location="http://localhost:8080/telefonica"/>
+            <soap:address location="http://localhost:8080/portal-middleware"/>
         </port>
     </service>
 

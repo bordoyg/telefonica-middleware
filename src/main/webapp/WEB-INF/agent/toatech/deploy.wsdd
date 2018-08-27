@@ -1,0 +1,57 @@
+<!-- Use this file to deploy some handlers/chains and services      -->
+<!-- Two ways to do this:                                           -->
+<!--   java org.apache.axis.client.AdminClient deploy.wsdd          -->
+<!--      after the axis server is running                          -->
+<!-- or                                                             -->
+<!--   java org.apache.axis.utils.Admin client|server deploy.wsdd   -->
+<!--      from the same directory that the Axis engine runs         -->
+
+<deployment
+    xmlns="http://xml.apache.org/axis/wsdd/"
+    xmlns:java="http://xml.apache.org/axis/wsdd/providers/java">
+
+  <!-- Services from agent_service WSDL service -->
+
+  <service name="agent_interface" provider="java:RPC" style="wrapped" use="literal">
+      <parameter name="wsdlTargetNamespace" value="urn:toatech:agent"/>
+      <parameter name="wsdlServiceElement" value="agent_service"/>
+      <parameter name="schemaQualified" value="urn:toatech:agent"/>
+      <parameter name="wsdlServicePort" value="agent_interface"/>
+      <parameter name="className" value="agent.toatech.Agent_bindingSkeleton"/>
+      <parameter name="wsdlPortType" value="agent_port_type"/>
+      <parameter name="typeMappingVersion" value="1.2"/>
+      <parameter name="allowedMethods" value="*"/>
+
+      <typeMapping
+        xmlns:ns="urn:toatech:agent"
+        qname="ns:message_t"
+        type="java:agent.toatech.Message_t"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <arrayMapping
+        xmlns:ns="urn:toatech:agent"
+        qname="ns:messages_t"
+        type="java:agent.toatech.Message_t[]"
+        innerType="cmp-ns:message_t" xmlns:cmp-ns="urn:toatech:agent"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="urn:toatech:agent"
+        qname="ns:user_t"
+        type="java:agent.toatech.User_t"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="urn:toatech:agent"
+        qname="ns:message_response_t"
+        type="java:agent.toatech.Message_response_t"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+  </service>
+</deployment>
