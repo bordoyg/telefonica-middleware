@@ -1,4 +1,4 @@
-package com.telefonica.portalmiddleware.service;
+package com.telefonica.portalmiddleware.service.rest;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -81,7 +81,7 @@ public abstract class BaseService {
 				this.setUri(uri);
 				this.setMethod(method);
 			}catch(Exception e){
-				LOG.debug("Hubo un error al levantar la configuracion");
+				LOG.error("Hubo un error al levantar la configuracion", e);
 			}
 		}
 	}
@@ -91,8 +91,10 @@ public abstract class BaseService {
 		try{
 			HttpRequestBase httpRequest=null;
 			URIBuilder builder = new URIBuilder(endPoint + uri);
-			for(Entry<String, String> entity: parameters.entrySet()){
-				builder.setParameter(entity.getKey(), entity.getValue());
+			if(parameters!=null){
+				for(Entry<String, String> entity: parameters.entrySet()){
+					builder.setParameter(entity.getKey(), entity.getValue());
+				}	
 			}
 			if(HttpGet.METHOD_NAME.compareTo(method)==0){
 				httpRequest=new HttpGet(builder.build());
@@ -104,8 +106,10 @@ public abstract class BaseService {
 				    ((HttpPost)httpRequest).setEntity(entity);	
 			    }
 			}
-			for(Entry<String, String> entity: headers.entrySet()){
-				httpRequest.setHeader(entity.getKey(), entity.getValue());
+			if(headers!=null){
+				for(Entry<String, String> entity: headers.entrySet()){
+					httpRequest.setHeader(entity.getKey(), entity.getValue());
+				}	
 			}
 			if(httpRequest!=null){
 				httpRequest.setConfig(baseConfiguration.getRequestConfig());
@@ -120,6 +124,7 @@ public abstract class BaseService {
 			// use org.apache.http.util.EntityUtils to read json as string
 			String json = EntityUtils.toString(entity, encoding);
 			
+			LOG.debug("Raw entity response: " + json);
 			if(response.getStatusLine().getStatusCode() < 200 
 					|| response.getStatusLine().getStatusCode() >= 400){
 				response.close();
@@ -135,8 +140,6 @@ public abstract class BaseService {
 		}catch(Throwable e){
 			throw e;
 		}finally{
-			parameters.clear();
-			headers.clear();
 			httpClient.close();
 		}
 	}

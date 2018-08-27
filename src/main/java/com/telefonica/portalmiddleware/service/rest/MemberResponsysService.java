@@ -1,4 +1,4 @@
-package com.telefonica.portalmiddleware.service;
+package com.telefonica.portalmiddleware.service.rest;
 
 import org.springframework.stereotype.Service;
 
