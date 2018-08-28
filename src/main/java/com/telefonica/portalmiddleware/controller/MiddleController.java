@@ -45,7 +45,14 @@ public class MiddleController extends BaseController {
 
 	@PostConstruct
 	public void init(){ 
-		renewTokenResponsys();
+		Thread t=new Thread(){
+			@Override
+			public void run(){
+				renewTokenResponsys();
+			}
+		};
+		t.start();
+		
 	}
 	
 }
