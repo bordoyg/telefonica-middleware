@@ -12,7 +12,7 @@ import org.apache.http.client.config.RequestConfig.Builder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-@Component
+@Component("baseConfigurationService")
 public class BaseConfigurationService {
 	private @Value("${baseService.timeout}") Integer timeout;
 	private @Value("${baseService.proxyPort}") Integer proxyPort;

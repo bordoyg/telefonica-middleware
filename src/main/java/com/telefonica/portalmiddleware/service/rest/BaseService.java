@@ -39,6 +39,7 @@ public abstract class BaseService {
 	@Qualifier("propertyConfigurer")
 	private Properties portalMiddlewareProperties;
 	@Autowired
+	@Qualifier("baseConfigurationService")
 	protected BaseConfigurationService baseConfiguration;
 	private String jsonEntity;
 	
