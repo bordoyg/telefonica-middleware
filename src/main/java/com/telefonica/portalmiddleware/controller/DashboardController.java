@@ -20,7 +20,8 @@ public class DashboardController extends BaseController{
 	
 	@RequestMapping("/dashboard")
 	public ModelAndView showDashboard() {
-		LOG.debug("showDashboard INICIO");
+		LOG.debug("showDashboard INICIO log4j");
+		System.out.println("showDashboard INICIO nativo");
 		return new ModelAndView("dashboard", "properties", portalMiddlewareProperties);
 	}
 

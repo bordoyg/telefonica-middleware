@@ -20,7 +20,7 @@ public class Agent_bindingImpl implements Agent_port_type{
     	respItem.setExternal_id("extenrnal id asd");
     	respItem.setMessage_id(123L);
     	respItem.setSent("sent asd");
-    	respItem.setStatus("status asd");
+    	respItem.setStatus("sent");
     	
     	response[0]=respItem;
     	
