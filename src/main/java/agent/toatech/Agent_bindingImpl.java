@@ -11,6 +11,10 @@ import java.rmi.RemoteException;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.springframework.web.context.support.WebApplicationContextUtils;
+
+import com.telefonica.portalmiddleware.controller.BaseController;
+import com.telefonica.portalmiddleware.controller.MiddleController;
 
 public class Agent_bindingImpl implements Agent_port_type{
 	private final Logger LOG = LogManager.getLogger(getClass());
@@ -26,6 +30,13 @@ public class Agent_bindingImpl implements Agent_port_type{
     		LOG.debug("subject: " + msj.getSubject());
     		LOG.debug("body: " + msj.getBody());
     		
+    		
+    		//MiddleController middleController=BaseController.getContext().getBean(MiddleController.class);
+//    		try {
+//				middleController.sendMessage();
+//			} catch (Exception e) {
+//				LOG.debug("Error al enviar mensaje");
+//			}
     		Message_response_t respItem=new Message_response_t();
         	
         	respItem.setData(msj.getBody());

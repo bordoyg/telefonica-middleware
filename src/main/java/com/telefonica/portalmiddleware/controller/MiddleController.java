@@ -42,7 +42,9 @@ public class MiddleController extends BaseController {
 		}
 	}
 
-
+	public void sendMessage()throws Exception{
+		LOG.debug("MiddleController sendMessage INICIO");
+	}
 	@PostConstruct
 	public void init(){ 
 		Thread t=new Thread(){
