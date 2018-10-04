@@ -11,13 +11,20 @@ import java.rmi.RemoteException;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import com.telefonica.portalmiddleware.controller.BaseController;
 import com.telefonica.portalmiddleware.controller.MiddleController;
+import com.telefonica.portalmiddleware.utils.ApplicationContextProvider;
 
 public class Agent_bindingImpl implements Agent_port_type{
 	private final Logger LOG = LogManager.getLogger(getClass());
+	private MiddleController middlewareController;
+	public Agent_bindingImpl(){
+		middlewareController = ApplicationContextProvider.getApplicationContext().getBean(MiddleController.class);
+	}
+	
     public Message_response_t[] send_message(User_t user, Message_t[] messages) throws RemoteException {
     	Message_response_t[] response=new Message_response_t[1];
     	LOG.debug("Mensaje recibido");
@@ -29,22 +36,16 @@ public class Agent_bindingImpl implements Agent_port_type{
     		LOG.debug("send_to: " + msj.getSend_to());
     		LOG.debug("subject: " + msj.getSubject());
     		LOG.debug("body: " + msj.getBody());
-    		
-    		
-    		//MiddleController middleController=BaseController.getContext().getBean(MiddleController.class);
-//    		try {
-//				middleController.sendMessage();
-//			} catch (Exception e) {
-//				LOG.debug("Error al enviar mensaje");
-//			}
+
+    		try {
+				middlewareController.sendMessage();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
     		Message_response_t respItem=new Message_response_t();
-        	
-        	respItem.setData(msj.getBody());
-        	respItem.setDescription("Descripcion asd");
-        	respItem.setDuration("duration asd");
-        	respItem.setExternal_id("extenrnal id asd");
+
         	respItem.setMessage_id(msj.getMessage_id());
-        	respItem.setSent("sent asd");
         	respItem.setStatus("sent");
         	
         	response[0]=respItem;

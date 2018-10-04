@@ -26,5 +26,5 @@
 		<property name="prefix" value="/WEB-INF/view/" />
 		<property name="suffix" value=".jsp" />
 	</bean>
-
+	<bean id="applicationContextProvder" class="com.telefonica.portalmiddleware.utils.ApplicationContextProvider"/>
 </beans>
