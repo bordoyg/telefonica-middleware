@@ -41,7 +41,7 @@ public abstract class BaseService {
 	@Autowired
 	@Qualifier("baseConfigurationService")
 	protected BaseConfigurationService baseConfiguration;
-	private String jsonEntity;
+	private String requestEntity;
 	
 	protected Map<String, String> headers=new HashMap<String, String>();
 	protected Map<String, String> parameters=new HashMap<String, String>();
@@ -102,8 +102,8 @@ public abstract class BaseService {
 			}
 			if(HttpPost.METHOD_NAME.compareTo(method)==0){
 			    httpRequest=new HttpPost(builder.build());
-			    if(jsonEntity!=null){
-			    	StringEntity entity = new StringEntity(jsonEntity);
+			    if(requestEntity!=null){
+			    	StringEntity entity = new StringEntity(requestEntity);
 				    ((HttpPost)httpRequest).setEntity(entity);	
 			    }
 			}
@@ -160,12 +160,11 @@ public abstract class BaseService {
 	public void setMethod(String method){
 		this.method=method;
 	}
-	
-	public String getJsonEntity() {
-		return jsonEntity;
+	public String getRequestEntity() {
+		return requestEntity;
 	}
-	public void setJsonEntity(String jsonEntity) {
-		this.jsonEntity = jsonEntity;
+	public void setRequestEntity(String requestEntity) {
+		this.requestEntity = requestEntity;
 	}
 	public Map<String, String> getHeaders() {
 		return headers;
