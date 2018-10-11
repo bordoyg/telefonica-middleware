@@ -7,13 +7,20 @@
 
 package agent.toatech;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.rmi.RemoteException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 
+import org.apache.http.util.ExceptionUtils;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
 
+import com.sun.jmx.snmp.Timestamp;
 import com.telefonica.portalmiddleware.service.rest.EventResponsysService;
 import com.telefonica.portalmiddleware.service.rest.MemberResponsysService;
 import com.telefonica.portalmiddleware.utils.ApplicationContextProvider;
@@ -34,26 +41,40 @@ public class Agent_bindingImpl implements Agent_port_type{
     	Message_t msj=Arrays.asList(messages).iterator().next();
     	
 		LOG.debug("message_id: " + msj.getMessage_id());
+		LOG.debug("subject: " + msj.getSubject());
 		LOG.debug("body: " + msj.getBody());
 
 		try {
-			JSONObject jsonBody=new JSONObject('{' + msj.getBody() + '}');
+			JSONObject jsonBodyTOA=new JSONObject('{' + msj.getBody() + '}');
+			String jsonRequestMemberRS="{'recordData':{'fieldNames':['EMAIL_ADDRESS_'],'records':[['@email@']]},'mergeRule':{'htmlValue':'H','optinValue':'I','textValue':'T','insertOnNoMatch':true,'updateOnMatch':'REPLACE_ALL','matchColumnName1':'EMAIL_ADDRESS_','matchColumnName2':null,'matchOperator':'NONE','optoutValue':'O','rejectRecordIfChannelEmpty':null,'defaultPermissionStatus':'OPTIN'}}";
+			jsonRequestMemberRS=jsonRequestMemberRS.replace("@email@", jsonBodyTOA.getString("cemail"));
+			memberResponsysService.setUri(memberResponsysService.getUri().replace("@listName@", "CONTACTS_LIST"));
+			JSONObject memberResponse=memberResponsysService.service(new JSONObject(jsonRequestMemberRS).toString());
 			
+			String jsonRequestEventRS="{ 'customEvent': { 'eventNumberDataMapping': null, 'eventDateDataMapping': null, 'eventStringDataMapping': null }, 'recipientData': [ { 'recipient': { 'emailAddress': '@email@', 'listName': { 'folderName': '@folderName@', 'objectName': '@objectName@' }, 'recipientId': null, 'mobileNumber': null, 'emailFormat': 'HTML_FORMAT' }}]}";
+			jsonRequestEventRS=jsonRequestEventRS.replace("@email@", jsonBodyTOA.getString("cemail"));
+			jsonRequestEventRS=jsonRequestEventRS.replace("@folderName@", "!MasterData");
+			jsonRequestEventRS=jsonRequestEventRS.replace("@objectName@", "CONTACTS_LIST");
 			
-			//{"recordData":{"fieldNames":["EMAIL_ADDRESS_"],"records":[["sskellor@itba.edu.ar"]]},"mergeRule":{"htmlValue":"H","optinValue":"I","textValue":"T","insertOnNoMatch":true,"updateOnMatch":"REPLACE_ALL","matchColumnName1":"EMAIL_ADDRESS_","matchColumnName2":null,"matchOperator":"NONE","optoutValue":"O","rejectRecordIfChannelEmpty":null,"defaultPermissionStatus":"OPTIN"}}
-			memberResponsysService.setRequestEntity(jsonBody.toString());
-			JSONObject memberResponse=memberResponsysService.service();
+			eventResponsysService.setUri(eventResponsysService.getUri().replace("@eventName@", msj.getSubject()));
+			JSONObject eventResponse=eventResponsysService.service(new JSONObject(jsonRequestEventRS).toString());
+			respItem.setStatus("sent");
 			
-			//DiaD1
-			//{ "customEvent": { "eventNumberDataMapping": null, "eventDateDataMapping": null, "eventStringDataMapping": null }, "recipientData": [ { "recipient": { "emailAddress": "sskellor@itba.edu.ar", "listName": { "folderName": "!MasterData", "objectName": "CONTACTS_LIST" }, "recipientId": null, "mobileNumber": null, "emailFormat": "HTML_FORMAT" }}]}
-			eventResponsysService.setRequestEntity(jsonBody.toString());
-			JSONObject eventResponse=eventResponsysService.service();
 		} catch (Throwable e) {
+			respItem.setStatus("fault");
+			StringWriter sw = new StringWriter();
+			PrintWriter pw = new PrintWriter(sw);
+			e.printStackTrace(pw);
+			String sStackTrace = sw.toString(); 
+			respItem.setData(sStackTrace);
+			String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+			respItem.setDescription("Hubo un error: " + timeStamp);
+			
 			LOG.debug("Hubo un error al intentar enviar el mensaje: " + msj.getMessage_id(), e);
 		}
 
     	respItem.setMessage_id(msj.getMessage_id());
-    	respItem.setStatus("sent");
+    	
     	
     	response[0]=respItem;
     	

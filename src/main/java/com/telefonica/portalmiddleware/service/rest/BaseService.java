@@ -41,7 +41,7 @@ public abstract class BaseService {
 	@Autowired
 	@Qualifier("baseConfigurationService")
 	protected BaseConfigurationService baseConfiguration;
-	private String requestEntity;
+
 	
 	protected Map<String, String> headers=new HashMap<String, String>();
 	protected Map<String, String> parameters=new HashMap<String, String>();
@@ -87,6 +87,9 @@ public abstract class BaseService {
 		}
 	}
 	public JSONObject service()throws Throwable{
+		return this.service(null);
+	}
+	public JSONObject service(String requestEntity)throws Throwable{
 		
 		CloseableHttpClient httpClient=HttpClients.createDefault();
 		try{
@@ -115,6 +118,11 @@ public abstract class BaseService {
 			if(httpRequest!=null){
 				httpRequest.setConfig(baseConfiguration.getRequestConfig());
 			}
+			LOG.debug("Request Raw entity: " + requestEntity);
+			LOG.debug("Request Headers: " + headers.toString());
+			LOG.debug("Request Method: " + method);
+			LOG.debug("Request URL: " + builder.build());
+			
 			CloseableHttpResponse response=httpClient.execute(httpRequest);
 			HttpEntity entity = response.getEntity();
 			Header encodingHeader = entity.getContentEncoding();
@@ -131,13 +139,17 @@ public abstract class BaseService {
 				response.close();
 				throw new Exception("hubo un error devuelto por el servicio: " + json );
 			}
-			
-			JSONObject jsonObject = new JSONObject(json);
-			if(jsonObject.has("errorCode")){
-				response.close();
-				throw new Exception("hubo un error devuelto por el servicio: " + json );
+			try{
+				JSONObject jsonObject = new JSONObject(json);
+				if(jsonObject.has("errorCode")){
+					response.close();
+					throw new Exception("hubo un error devuelto por el servicio: " + json );
+				}
+				return jsonObject;
+			}catch(Throwable e){
+				LOG.debug("Response isn't json, return null");
 			}
-			return jsonObject;
+			return null;
 		}catch(Throwable e){
 			throw e;
 		}finally{
@@ -160,12 +172,7 @@ public abstract class BaseService {
 	public void setMethod(String method){
 		this.method=method;
 	}
-	public String getRequestEntity() {
-		return requestEntity;
-	}
-	public void setRequestEntity(String requestEntity) {
-		this.requestEntity = requestEntity;
-	}
+
 	public Map<String, String> getHeaders() {
 		return headers;
 	}
