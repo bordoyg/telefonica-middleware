@@ -1,5 +1,5 @@
 
-<h1>Portal Middleware - Dashboard </h1>
+<h1>Portal Middleware - Dashboard v${properties['version']}</h1>
 <p><b>Renovaci&oacute;n de token Responsys:</b>  ${properties['schedule.responsysToken.cron']} <b>cron expresion</b></p>
 <p><b>Timeout servicios:</b> ${properties['baseService.timeout']} milisegundos</p>
 <p><b>Proxy Host:</b> ${properties['baseService.proxyHost']} </p>
