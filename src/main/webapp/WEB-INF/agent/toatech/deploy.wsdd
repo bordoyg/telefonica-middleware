@@ -17,7 +17,7 @@
       <parameter name="wsdlServiceElement" value="agent_service"/>
       <parameter name="schemaQualified" value="urn:toatech:agent"/>
       <parameter name="wsdlServicePort" value="agent_interface"/>
-      <parameter name="className" value="agent.toatech.Agent_bindingSkeleton"/>
+      <parameter name="className" value="ar.com.telefonica.portalmiddleware.service.inbound.Agent_bindingSkeleton"/>
       <parameter name="wsdlPortType" value="agent_port_type"/>
       <parameter name="typeMappingVersion" value="1.2"/>
       <parameter name="allowedMethods" value="*"/>
