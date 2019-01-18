@@ -27,6 +27,7 @@ public class SoapFilter implements Filter {
 			throws IOException, ServletException {
 
 		CustomHttpServletRequestWrapper wrapperRequest = new CustomHttpServletRequestWrapper((HttpServletRequest) req);
+		LOG.debug("SOAP REQUEST:");
 		LOG.debug(wrapperRequest.getBody());
 		
 		HttpServletResponse httpResponse = (HttpServletResponse) resp;
@@ -37,6 +38,7 @@ public class SoapFilter implements Filter {
 		content=content.replaceAll("send_messageResponse", "send_message_response");
 		
 		resp.getWriter().write(content);
+		LOG.debug("SOAP RESPONSE:");
 		LOG.debug(content);
 	}
 	public void destroy() {}
