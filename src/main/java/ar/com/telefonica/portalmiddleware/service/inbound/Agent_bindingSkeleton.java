@@ -45,6 +45,8 @@ public class Agent_bindingSkeleton extends agent.toatech.Agent_bindingSkeleton {
 			Agent_serviceLocator serviceFactory=new Agent_serviceLocator();
 			Agent_port_type service=serviceFactory.getagent_interface(url);
 			LOG.debug("Conectando al servicio de JUMP");
+			//cuando en el body se recibe mas de un mensaje el servicio rompe
+			//iterar el array messages[] y hacer una invocacion por cada elemento del array
 			Message_response_t[] response= service.send_message(user, messages);
 			LOG.debug("Mensaje enviado a JUMP satisfactoriamente");
 			return response;
