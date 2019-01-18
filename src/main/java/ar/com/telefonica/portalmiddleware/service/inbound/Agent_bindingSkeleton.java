@@ -37,8 +37,6 @@ public class Agent_bindingSkeleton extends agent.toatech.Agent_bindingSkeleton {
 	    	
 			LOG.debug("message_id: " + msj.getMessage_id());
 			LOG.debug("subject: " + msj.getSubject());
-			LOG.debug("body: " + msj.getBody());
-	
 			ResourceBundle properties = ResourceBundle.getBundle("portal-middleware");
 			String surl=properties.getString("service.jump.url");
 			LOG.debug("url Jump: " + surl);
