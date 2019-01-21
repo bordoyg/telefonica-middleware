@@ -31,25 +31,47 @@ public class Agent_bindingSkeleton extends agent.toatech.Agent_bindingSkeleton {
 	
 	@Override
     public Message_response_t[] send_message(User_t user,Message_t[] messages) throws RemoteException{
+		int i=0;
 		try{
-	    	LOG.debug("Mensaje recibido");
-	    	Message_t msj=Arrays.asList(messages).iterator().next();
+	    	LOG.debug("INICIO send_message");
 	    	
-			LOG.debug("message_id: " + msj.getMessage_id());
-			LOG.debug("subject: " + msj.getSubject());
 			ResourceBundle properties = ResourceBundle.getBundle("portal-middleware");
 			String surl=properties.getString("service.jump.url");
 			LOG.debug("url Jump: " + surl);
 			URL url=new URL(surl);
-		
 			Agent_serviceLocator serviceFactory=new Agent_serviceLocator();
 			Agent_port_type service=serviceFactory.getagent_interface(url);
+		
 			LOG.debug("Conectando al servicio de JUMP");
 			//cuando en el body se recibe mas de un mensaje el servicio rompe
 			//iterar el array messages[] y hacer una invocacion por cada elemento del array
-			Message_response_t[] response= service.send_message(user, messages);
-			LOG.debug("Mensaje enviado a JUMP satisfactoriamente");
-			return response;
+			Message_response_t[] responses=new Message_response_t[messages.length];
+			for(i=0; i<messages.length; i++){
+				Message_response_t respItem=new Message_response_t();
+				Message_t message=messages[i];
+				try{
+					Message_t[] messgs=new Message_t[1];
+					messgs[0]=message;
+					LOG.debug("Enviando mensaje: " + message.getMessage_id());
+					Message_response_t[] reps= service.send_message(user, messgs);
+					responses[i]=reps[0];
+					LOG.debug("Mensaje enviado a JUMP satisfactoriamente");
+				}catch(Exception e){
+					LOG.error("Hubo un error al intentar enviar el mensaje: " + message.getMessage_id(), e);
+					respItem.setStatus("fault");
+					StringWriter sw = new StringWriter();
+					PrintWriter pw = new PrintWriter(sw);
+					e.printStackTrace(pw);
+					String sStackTrace = sw.toString(); 
+					respItem.setData(sStackTrace);
+					String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+					respItem.setDescription("Hubo un error: " + timeStamp);
+					respItem.setMessage_id(message.getMessage_id());
+					responses[i]=respItem;
+				}
+			}
+			LOG.debug("FIN send_message");
+			return responses;
 		}catch(Exception e){
 			Message_response_t[] response= new Message_response_t[1];
 			Message_response_t respItem=new Message_response_t();
@@ -63,12 +85,9 @@ public class Agent_bindingSkeleton extends agent.toatech.Agent_bindingSkeleton {
 			respItem.setDescription("Hubo un error: " + timeStamp);
 			
 			LOG.error("Hubo un error al intentar enviar el mensaje: " + timeStamp, e);
-			Message_t msj=Arrays.asList(messages).iterator().next();
-			if(msj!=null){
-				LOG.error("mensaje id: " +msj.getMessage_id());
-				respItem.setMessage_id(msj.getMessage_id());
-			}
-	    	response[0]=respItem;
+			
+	    	response[i]=respItem;
+	    	LOG.debug("FIN send_message");
 	    	return response;
 		}
     }
