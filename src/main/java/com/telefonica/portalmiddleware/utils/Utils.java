@@ -1,8 +1,5 @@
 package com.telefonica.portalmiddleware.utils;
 
-import java.security.MessageDigest;
-import java.security.SecureRandom;
-
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
@@ -10,7 +7,6 @@ import javax.crypto.spec.SecretKeySpec;
 import org.apache.axis.encoding.Base64;
 
 public class Utils {
-	private static final String ALGORITHM="AES";
 	private static final String key="p0r7417313f0n1c4";
     public static String encrypt(String plainText) throws Exception{
     	byte[] clean = plainText.getBytes();
@@ -32,7 +28,7 @@ public class Utils {
     }
     public static void main(String args[]){
     	try {
-			System.out.println(encrypt("hola"));
+			System.out.println(encrypt("5012393"));
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
