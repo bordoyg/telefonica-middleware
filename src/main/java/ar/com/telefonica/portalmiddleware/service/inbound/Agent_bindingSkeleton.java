@@ -25,6 +25,8 @@ import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 
+import com.telefonica.portalmiddleware.utils.Utils;
+
 import agent.toatech.Agent_port_type;
 import agent.toatech.Agent_serviceLocator;
 import agent.toatech.Message_response_t;
@@ -108,7 +110,8 @@ public class Agent_bindingSkeleton extends agent.toatech.Agent_bindingSkeleton {
 	private void addDataToMessage(Message_t message, String portalUrl) throws Exception {
 	    Document document = builder.parse(new InputSource(new StringReader(message.getBody())));  
 	    String aid=document.getElementsByTagName("aid").item(0).getTextContent();
-	    String activityUrl=portalUrl + "?activity=" + aid;
+	    String encriptedAid=Utils.encrypt(aid);
+	    String activityUrl=portalUrl + "?activity=" + encriptedAid;
 	    LOG.debug("activityUrl= " + activityUrl);
 		StringBuilder sb=new StringBuilder();
 		sb.append(message.getBody());
