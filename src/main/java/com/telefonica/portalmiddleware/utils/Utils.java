@@ -28,7 +28,7 @@ public class Utils {
     }
     public static void main(String args[]){
     	try {
-			System.out.println(encrypt("5012393"));
+			System.out.println(encrypt("5014971"));
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
