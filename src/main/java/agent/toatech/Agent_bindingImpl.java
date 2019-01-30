@@ -8,6 +8,7 @@
 package agent.toatech;
 
 import java.io.PrintWriter;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.rmi.RemoteException;
 import java.text.SimpleDateFormat;
@@ -18,10 +19,13 @@ import java.util.Properties;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
+import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
 
 import com.telefonica.portalmiddleware.service.rest.EventResponsysService;
 import com.telefonica.portalmiddleware.service.rest.MemberResponsysService;
 import com.telefonica.portalmiddleware.utils.ApplicationContextProvider;
+import com.telefonica.portalmiddleware.utils.Utils;
 
 public class Agent_bindingImpl implements Agent_port_type{
 	private final Logger LOG = LogManager.getLogger(getClass());
@@ -46,9 +50,9 @@ public class Agent_bindingImpl implements Agent_port_type{
 
 		try {
 			String contactList=portalMiddlewareProperties.getProperty("repsonsys.contact-list");
-			
 			JSONObject jsonBodyTOA=new JSONObject('{' + msj.getBody() + '}');
-			String jsonRequestMemberRS="{'recordData':{'fieldNames':['EMAIL_ADDRESS_'],'records':[['@email@']]},'mergeRule':{'htmlValue':'H','optinValue':'I','textValue':'T','insertOnNoMatch':true,'updateOnMatch':'REPLACE_ALL','matchColumnName1':'EMAIL_ADDRESS_','matchColumnName2':null,'matchOperator':'NONE','optoutValue':'O','rejectRecordIfChannelEmpty':null,'defaultPermissionStatus':'OPTIN'}}";
+			String urlPortal=createURLPortal(jsonBodyTOA.getInt("aid"));
+			String jsonRequestMemberRS="{'recordData':{'fieldNames':['EMAIL_ADDRESS_','URL_CONFIRMAR','URL_CANCELAR','URL_MODIFICAR','URL_UBIC_TECNICO'],'records':[['@email@', '" + urlPortal + "', '" + urlPortal + "', '" + urlPortal + "', '" + urlPortal + "']]},'mergeRule':{'htmlValue':'H','optinValue':'I','textValue':'T','insertOnNoMatch':true,'updateOnMatch':'REPLACE_ALL','matchColumnName1':'EMAIL_ADDRESS_','matchColumnName2':null,'matchOperator':'NONE','optoutValue':'O','rejectRecordIfChannelEmpty':null,'defaultPermissionStatus':'OPTIN'}}";
 			jsonRequestMemberRS=jsonRequestMemberRS.replace("@email@", jsonBodyTOA.getString("cemail"));
 			memberResponsysService.setUri(memberResponsysService.getUri().replace("@listName@", contactList));
 			JSONObject memberResponse=memberResponsysService.service(new JSONObject(jsonRequestMemberRS).toString());
@@ -85,5 +89,9 @@ public class Agent_bindingImpl implements Agent_port_type{
     	
     	return response;
     }
-
+	private String createURLPortal(int aid) throws Exception {
+		String url=portalMiddlewareProperties.getProperty("portal.url");
+		String encriptedAid=Utils.encrypt(String.valueOf(aid));
+		return url + "?" + encriptedAid;
+	}
 }
