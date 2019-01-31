@@ -111,7 +111,7 @@ public class Agent_bindingSkeleton extends agent.toatech.Agent_bindingSkeleton {
 	    Document document = builder.parse(new InputSource(new StringReader(message.getBody())));  
 	    String aid=document.getElementsByTagName("aid").item(0).getTextContent();
 	    String encriptedAid=Utils.encrypt(aid);
-	    String activityUrl=portalUrl + "?" + encriptedAid;
+	    String activityUrl=portalUrl + "?" + encriptedAid.replaceAll("=", "");
 	    LOG.debug("URL Portal= " + activityUrl);
 		StringBuilder sb=new StringBuilder();
 		sb.append(message.getBody());
