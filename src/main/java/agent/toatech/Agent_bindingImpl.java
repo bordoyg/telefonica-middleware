@@ -51,9 +51,16 @@ public class Agent_bindingImpl implements Agent_port_type{
 		try {
 			String contactList=portalMiddlewareProperties.getProperty("repsonsys.contact-list");
 			JSONObject jsonBodyTOA=new JSONObject('{' + msj.getBody() + '}');
-			String urlPortal=createURLPortal(jsonBodyTOA.getInt("aid"));
-			String jsonRequestMemberRS="{'recordData':{'fieldNames':['EMAIL_ADDRESS_','URL_CONFIRMAR','URL_CANCELAR','URL_MODIFICAR','URL_UBIC_TECNICO'],'records':[['@email@', '" + urlPortal + "', '" + urlPortal + "', '" + urlPortal + "', '" + urlPortal + "']]},'mergeRule':{'htmlValue':'H','optinValue':'I','textValue':'T','insertOnNoMatch':true,'updateOnMatch':'REPLACE_ALL','matchColumnName1':'EMAIL_ADDRESS_','matchColumnName2':null,'matchOperator':'NONE','optoutValue':'O','rejectRecordIfChannelEmpty':null,'defaultPermissionStatus':'OPTIN'}}";
-			jsonRequestMemberRS=jsonRequestMemberRS.replace("@email@", jsonBodyTOA.getString("cemail"));
+			String jsonRequestMemberRS="{'recordData':{'fieldNames':['EMAIL_ADDRESS_','URL_CONFIRMAR','URL_CANCELAR','URL_MODIFICAR','URL_UBIC_TECNICO', 'MOBILE_NUMBER_','FECHA_CITA', 'FRANJA_HORARIA', 'NOMBRE','NOMBRE_TECNICO'],'records':[['@email@', '@urlPortal@', '@urlPortal@', '@urlPortal@', '@urlPortal@', '@mobileNumber@', '@fechaCita@', '@franjaHoraria@', '@nombre@', '@nombreTecnico@']]},'mergeRule':{'htmlValue':'H','optinValue':'I','textValue':'T','insertOnNoMatch':true,'updateOnMatch':'REPLACE_ALL','matchColumnName1':'EMAIL_ADDRESS_','matchColumnName2':null,'matchOperator':'NONE','optoutValue':'O','rejectRecordIfChannelEmpty':null,'defaultPermissionStatus':'OPTIN'}}";
+			
+			jsonRequestMemberRS=jsonRequestMemberRS.replaceAll("@email@", jsonBodyTOA.getString("cemail"))
+					.replaceAll("@urlPortal@", createURLPortal(jsonBodyTOA.getInt("aid")))
+					.replaceAll("@mobileNumber@", jsonBodyTOA.getString("ccell"))
+					.replaceAll("@fechaCita@", jsonBodyTOA.getString("route_date"))
+					.replaceAll("@franjaHoraria@", jsonBodyTOA.getString("activity_time_slot"))
+					.replaceAll("@nombre@", jsonBodyTOA.getString("activity_customer_name"))
+					.replaceAll("@nombreTecnico@", jsonBodyTOA.getString("resource_name"));
+			
 			memberResponsysService.setUri(memberResponsysService.getUri().replace("@listName@", contactList));
 			JSONObject memberResponse=memberResponsysService.service(new JSONObject(jsonRequestMemberRS).toString());
 			
@@ -92,6 +99,6 @@ public class Agent_bindingImpl implements Agent_port_type{
 	private String createURLPortal(int aid) throws Exception {
 		String url=portalMiddlewareProperties.getProperty("portal.url");
 		String encriptedAid=Utils.encrypt(String.valueOf(aid));
-		return url + "?" + encriptedAid;
+		return url + "?" + encriptedAid.replaceAll("=", "");
 	}
 }
