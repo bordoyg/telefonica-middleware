@@ -56,7 +56,7 @@ public class Agent_bindingImpl implements Agent_port_type{
 			jsonRequestMemberRS=jsonRequestMemberRS.replaceAll("@email@", jsonBodyTOA.getString("cemail"))
 					.replaceAll("@urlPortal@", createURLPortal(jsonBodyTOA.getInt("aid")))
 					.replaceAll("@mobileNumber@", jsonBodyTOA.getString("ccell"))
-					.replaceAll("@countryCode@", jsonBodyTOA.getString("ccell"))
+					.replaceAll("@countryCode@", jsonBodyTOA.getString("country_code"))
 					.replaceAll("@fechaCita@", jsonBodyTOA.getString("route_date"))
 					.replaceAll("@franjaHoraria@", jsonBodyTOA.getString("activity_time_slot"))
 					.replaceAll("@nombre@", jsonBodyTOA.getString("activity_customer_name"))
