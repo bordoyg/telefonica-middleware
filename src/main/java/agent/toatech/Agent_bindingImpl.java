@@ -62,7 +62,8 @@ public class Agent_bindingImpl implements Agent_port_type{
 					.replaceAll("@nombre@", jsonBodyTOA.getString("activity_customer_name"))
 					.replaceAll("@nombreTecnico@", jsonBodyTOA.getString("resource_name"));
 			
-			memberResponsysService.setUri(memberResponsysService.getUri().replace("@listName@", contactList));
+			String urlMember=portalMiddlewareProperties.getProperty("memberResponsysService.uri");
+			memberResponsysService.setUri(urlMember.replace("@listName@", contactList));
 			JSONObject memberResponse=memberResponsysService.service(new JSONObject(jsonRequestMemberRS).toString());
 			
 			String jsonRequestEventRS="{ 'customEvent': { 'eventNumberDataMapping': null, 'eventDateDataMapping': null, 'eventStringDataMapping': null }, 'recipientData': [ { 'recipient': { 'emailAddress': '@email@', 'listName': { 'folderName': '@folderName@', 'objectName': '@objectName@' }, 'recipientId': null, 'mobileNumber': null, 'emailFormat': 'HTML_FORMAT' }}]}";
@@ -72,11 +73,11 @@ public class Agent_bindingImpl implements Agent_port_type{
 			jsonRequestEventRS=jsonRequestEventRS.replace("@folderName@", folder);
 			jsonRequestEventRS=jsonRequestEventRS.replace("@objectName@", contactList);
 			
-			eventResponsysService.setUri(eventResponsysService.getUri().replace("@eventName@", msj.getSubject()));
+			String urlEvent=portalMiddlewareProperties.getProperty("eventResponsysService.uri");
+			memberResponsysService.setUri(urlEvent.replace("@eventName@", msj.getSubject()));
 			JSONObject eventResponse=eventResponsysService.service(new JSONObject(jsonRequestEventRS).toString());
 			respItem.setStatus("sent");
 			LOG.debug("El mensaje " + msj.getMessage_id() + " se envio a Responsys correctamente");
-			
 		} catch (Throwable e) {
 			respItem.setStatus("fault");
 			StringWriter sw = new StringWriter();

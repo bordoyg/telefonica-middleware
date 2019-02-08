@@ -24,6 +24,8 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -46,7 +48,7 @@ public abstract class BaseService {
 	protected Map<String, String> headers=new HashMap<String, String>();
 	protected Map<String, String> parameters=new HashMap<String, String>();
 	
-    private final Log LOG = LogFactory.getLog(getClass());
+	private final Logger LOG = LogManager.getLogger(getClass());
 
 	@PostConstruct
 	public void init(){ 
