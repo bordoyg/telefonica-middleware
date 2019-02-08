@@ -74,7 +74,7 @@ public class Agent_bindingImpl implements Agent_port_type{
 			jsonRequestEventRS=jsonRequestEventRS.replace("@objectName@", contactList);
 			
 			String urlEvent=portalMiddlewareProperties.getProperty("eventResponsysService.uri");
-			memberResponsysService.setUri(urlEvent.replace("@eventName@", msj.getSubject()));
+			eventResponsysService.setUri(urlEvent.replace("@eventName@", msj.getSubject()));
 			JSONObject eventResponse=eventResponsysService.service(new JSONObject(jsonRequestEventRS).toString());
 			respItem.setStatus("sent");
 			LOG.debug("El mensaje " + msj.getMessage_id() + " se envio a Responsys correctamente");
