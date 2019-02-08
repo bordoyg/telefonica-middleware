@@ -5,6 +5,7 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.axis.encoding.Base64;
+import org.apache.commons.lang3.StringUtils;
 
 public class Utils {
 	private static final String key="p0r7417313f0n1c4";
@@ -24,7 +25,9 @@ public class Utils {
         cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, ivParameterSpec);
         byte[] encrypted = cipher.doFinal(clean);
 
-        return Base64.encode(encrypted);
+        String encryptedValue = Base64.encode(encrypted);
+
+        return StringUtils.replaceEach(encryptedValue, new String[] {"+", "/", "="}, new String[] {"_", "~", "*"});
     }
     public static void main(String args[]){
     	try {
