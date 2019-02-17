@@ -86,6 +86,9 @@ public class Agent_bindingSkeleton extends agent.toatech.Agent_bindingSkeleton {
 				}
 			}
 			LOG.debug("FIN send_message");
+			for(i=0; i<responses.length; i++){
+				LOG.debug("Message_response_t[" + (i + 1) + "]" + responses[i]);
+			}
 			return responses;
 		}catch(Exception e){
 			Message_response_t[] response= new Message_response_t[1];
