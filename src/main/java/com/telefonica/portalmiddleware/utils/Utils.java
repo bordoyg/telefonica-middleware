@@ -5,7 +5,7 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.axis.encoding.Base64;
-import org.apache.commons.lang3.StringUtils;
+import java.net.URLEncoder;
 
 public class Utils {
 	private static final String key="p0r7417313f0n1c4";
@@ -27,7 +27,7 @@ public class Utils {
 
         String encryptedValue = Base64.encode(encrypted);
 
-        return StringUtils.replaceEach(encryptedValue, new String[] {"+", "/", "="}, new String[] {"_", "~", "*"});
+        return URLEncoder.encode(encryptedValue, "UTF-8");
     }
     public static void main(String args[]){
     	try {

@@ -6,6 +6,7 @@
  */
 
 package agent.toatech;
+import java.lang.StringBuilder;
 
 public class Message_response_t  implements java.io.Serializable {
     private long message_id;
@@ -333,4 +334,18 @@ public class Message_response_t  implements java.io.Serializable {
             _javaType, _xmlType, typeDesc);
     }
 
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder(30);
+        sb.append("[Message_response_t] = {")
+            .append(this.getMessage_id())
+            .append(", ").append(this.getStatus())
+            .append(", ").append(this.getDescription())
+            .append(", ").append(this.getData())
+            .append(", ").append(this.getExternal_id())
+            .append(", ").append(this.getDuration())
+            .append(", ").append(this.getSent())
+            .append("}");
+        return sb.toString();
+    }
 }
