@@ -26,12 +26,15 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
 
 public abstract class BaseService {
+	public static final String STATUS_SENT="sent";
+	public static final String STATUS_FAILED="failed";
 	protected String endPoint;
 	protected String uri;
 	protected String method;
@@ -92,7 +95,7 @@ public abstract class BaseService {
 		return this.service(null);
 	}
 	public JSONObject service(String requestEntity)throws Throwable{
-		
+		CloseableHttpResponse response=null;
 		CloseableHttpClient httpClient=HttpClients.createDefault();
 		try{
 			HttpRequestBase httpRequest=null;
@@ -125,7 +128,7 @@ public abstract class BaseService {
 			LOG.debug("Request Method: " + method);
 			LOG.debug("Request URL: " + builder.build());
 			
-			CloseableHttpResponse response=httpClient.execute(httpRequest);
+			response=httpClient.execute(httpRequest);
 			HttpEntity entity = response.getEntity();
 			Header encodingHeader = entity.getContentEncoding();
 			
@@ -143,19 +146,25 @@ public abstract class BaseService {
 			}
 			try{
 				JSONObject jsonObject = new JSONObject(json);
-				if(jsonObject.has("errorCode")){
-					response.close();
-					throw new Exception("hubo un error devuelto por el servicio: " + json );
-				}
 				return jsonObject;
 			}catch(Throwable e){
-				LOG.debug("Response isn't json, return null");
+				try{
+					JSONArray jsonArray = new JSONArray(json);
+					return (JSONObject)jsonArray.get(0);
+				}catch(Throwable e2){
+					LOG.debug("La respuesta del servicio no es un Json, return null: " + json);
+				}
 			}
 			return null;
 		}catch(Throwable e){
 			throw e;
 		}finally{
-			httpClient.close();
+			if(response!=null){
+				response.close();	
+			}
+			if(httpClient!=null){
+				httpClient.close();	
+			}
 		}
 	}
 
