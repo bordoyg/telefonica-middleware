@@ -25,6 +25,7 @@ import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 
+import com.telefonica.portalmiddleware.service.rest.BaseService;
 import com.telefonica.portalmiddleware.utils.Utils;
 
 import agent.toatech.Agent_port_type;
@@ -73,12 +74,11 @@ public class Agent_bindingSkeleton extends agent.toatech.Agent_bindingSkeleton {
 					LOG.debug("Mensaje enviado a JUMP satisfactoriamente");
 				}catch(Exception e){
 					LOG.error("Hubo un error al intentar enviar el mensaje: " + message.getMessage_id(), e);
-					respItem.setStatus("fault");
+					respItem.setStatus(BaseService.STATUS_FAILED);
 					StringWriter sw = new StringWriter();
 					PrintWriter pw = new PrintWriter(sw);
 					e.printStackTrace(pw);
-					String sStackTrace = sw.toString(); 
-					respItem.setData(sStackTrace);
+					respItem.setData(e.getMessage());
 					String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
 					respItem.setDescription("Hubo un error: " + timeStamp);
 					respItem.setMessage_id(message.getMessage_id());
