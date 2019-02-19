@@ -33,6 +33,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
 
 public abstract class BaseService {
+	public static final String STATUS_DELIVERED="delivered";
 	public static final String STATUS_SENT="sent";
 	public static final String STATUS_FAILED="failed";
 	protected String endPoint;
