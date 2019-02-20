@@ -10,6 +10,7 @@ package agent.toatech;
 import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.nio.charset.Charset;
 import java.rmi.RemoteException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -65,6 +66,8 @@ public class Agent_bindingImpl implements Agent_port_type{
 						.replaceAll("@nombre@", jsonBodyTOA.getString("activity_customer_name"))
 						.replaceAll("@nombreTecnico@", jsonBodyTOA.getString("resource_name"));
 				
+				jsonRequestMemberRS=replaceChars(jsonRequestMemberRS);
+				
 				String urlMember=portalMiddlewareProperties.getProperty("memberResponsysService.uri");
 				memberResponsysService.setUri(urlMember.replace("@listName@", contactList));
 				JSONObject memberResponse=memberResponsysService.service(new JSONObject(jsonRequestMemberRS).toString());
@@ -78,6 +81,8 @@ public class Agent_bindingImpl implements Agent_port_type{
 				String folder=portalMiddlewareProperties.getProperty("repsonsys.folder");
 				jsonRequestEventRS=jsonRequestEventRS.replace("@folderName@", folder);
 				jsonRequestEventRS=jsonRequestEventRS.replace("@objectName@", contactList);
+				
+				jsonRequestEventRS=replaceChars(jsonRequestEventRS);
 				
 				String urlEvent=portalMiddlewareProperties.getProperty("eventResponsysService.uri");
 				eventResponsysService.setUri(urlEvent.replace("@eventName@", message.getSubject()));
@@ -108,6 +113,25 @@ public class Agent_bindingImpl implements Agent_port_type{
     	
     	return responses;
     }
+	private String replaceChars(String jsonRequestEventRS) {
+		//jsonRequestEventRS=new String(jsonRequestEventRS.getBytes(),Charset.forName("UTF-8"));
+		return jsonRequestEventRS;
+		/*
+		return jsonRequestEventRS.replaceAll("�", "&aacute;")
+				.replaceAll("�", "&eacute;")
+				.replaceAll("�", "&iacute;")
+				.replaceAll("�", "&oacute;")
+				.replaceAll("�", "&uacute;")
+				.replaceAll("�", "&Aacute;")
+				.replaceAll("�", "&Eacute;")
+				.replaceAll("�", "&Iacute;")
+				.replaceAll("�", "&Oacute;")
+				.replaceAll("�", "&Uacute;")
+				.replaceAll("�", "&ntilde;")
+				.replaceAll("�", "&Ntilde;");
+				*/
+	}
+
 	private String createURLPortal(int aid) throws Exception {
 		String url=portalMiddlewareProperties.getProperty("portal.url");
 		String encriptedAid=Utils.encrypt(String.valueOf(aid));

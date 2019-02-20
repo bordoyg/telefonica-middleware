@@ -112,7 +112,7 @@ public abstract class BaseService {
 			if(HttpPost.METHOD_NAME.compareTo(method)==0){
 			    httpRequest=new HttpPost(builder.build());
 			    if(requestEntity!=null){
-			    	StringEntity entity = new StringEntity(requestEntity);
+			    	StringEntity entity = new StringEntity(requestEntity, Charset.forName("UTF-8"));
 				    ((HttpPost)httpRequest).setEntity(entity);	
 			    }
 			}
