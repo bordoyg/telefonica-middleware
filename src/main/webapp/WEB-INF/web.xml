@@ -21,6 +21,7 @@
 		</init-param>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
+	<!-- 
 	<servlet>
 		<display-name>Apache-Axis Servlet</display-name>
 		<servlet-name>AxisServlet</servlet-name>
@@ -32,7 +33,8 @@
 		<servlet-class>org.apache.axis.transport.http.AdminServlet</servlet-class>
 		<load-on-startup>100</load-on-startup>
 	</servlet>
-
+	 -->
+	<!-- 
 	<servlet-mapping>
 		<servlet-name>spring</servlet-name>
 		<url-pattern>*.htm</url-pattern>
@@ -53,6 +55,7 @@
 		<servlet-name>AdminServlet</servlet-name>
 		<url-pattern>/servlet/AdminServlet</url-pattern>
 	</servlet-mapping>
+	 -->
 	<servlet-mapping>
 		<servlet-name>Jersey REST Service</servlet-name>
 		<url-pattern>/rest/*</url-pattern>

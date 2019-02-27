@@ -14,7 +14,9 @@
 
 
 	<mvc:annotation-driven />
-	<context:component-scan base-package="com.telefonica.*" />
+	<context:component-scan base-package="com.telefonica.*" >
+		<context:exclude-filter type="regex" expression="com.telefonica.portalmiddleware.controller.MiddleController"/>
+	</context:component-scan>
 	<mvc:default-servlet-handler />
 	<util:properties id="propertyConfigurer" location="classpath:/portal-middleware.properties " />
 	<context:property-placeholder properties-ref="propertyConfigurer" />
