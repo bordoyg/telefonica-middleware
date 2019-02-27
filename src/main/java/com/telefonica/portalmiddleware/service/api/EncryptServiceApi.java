@@ -11,10 +11,8 @@ import com.telefonica.portalmiddleware.utils.Utils;
 @Path("/encrypt/{plainText}")
 public class EncryptServiceApi {
 	@GET
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.TEXT_PLAIN)
 	public String encript(@PathParam("plainText") String plainText)throws Exception{
-		//throw new Exception("quilombooo");
 		return Utils.encrypt(plainText);
-		
 	}
 }
