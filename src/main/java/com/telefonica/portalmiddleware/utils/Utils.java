@@ -4,11 +4,9 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
-import org.apache.axis.encoding.Base64;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.net.URLEncoder;
+import java.util.Base64;
 
 
 public class Utils {
@@ -29,12 +27,12 @@ public class Utils {
         cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, ivParameterSpec);
         byte[] encrypted = cipher.doFinal(clean);
 
-        String encryptedValue = new String(Base64.encode(encrypted));
-        //return encryptedValue;
-        return URLEncoder.encode(encryptedValue, "UTF-8");
+        String encryptedValue = new String(Base64.getUrlEncoder().encode(encrypted)).replaceAll("=", "");
+        return encryptedValue;
+        //return URLEncoder.encode(encryptedValue, "UTF-8");
     }
     public static String decrypt(String plainText) throws Exception{
-    	byte[] clean = Base64.decode(plainText);
+    	byte[] clean = Base64.getUrlDecoder().decode(plainText);
 
         // Generating IV.
         byte[] iv = key.getBytes("UTF-8");
@@ -53,6 +51,7 @@ public class Utils {
     }
     public static void main(String args[]){
     	try {
+    		System.out.println(encrypt("5014971"));
 			System.out.println(encrypt("8239159"));
 			System.out.println(decrypt("QnoXWFHrPHv-p1h6CWB3yQ=="));
 		} catch (Exception e) {
