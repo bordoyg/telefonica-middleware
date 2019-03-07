@@ -27,12 +27,13 @@ public class Utils {
         cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, ivParameterSpec);
         byte[] encrypted = cipher.doFinal(clean);
 
-        String encryptedValue = new String(Base64.getUrlEncoder().encode(encrypted)).replaceAll("=", "");
+        String encryptedValue = new String(Base64.getEncoder().encode(encrypted)).replace("=", "").replace("+", ":").replace("/", "_");
         return encryptedValue;
         //return URLEncoder.encode(encryptedValue, "UTF-8");
     }
     public static String decrypt(String plainText) throws Exception{
-    	byte[] clean = Base64.getUrlDecoder().decode(plainText);
+    	plainText=plainText.replace(":", "+").replaceAll("_", "/") + "==";
+    	byte[] clean = Base64.getDecoder().decode(plainText);
 
         // Generating IV.
         byte[] iv = key.getBytes("UTF-8");
@@ -51,9 +52,10 @@ public class Utils {
     }
     public static void main(String args[]){
     	try {
+    		System.out.println(encrypt("5016673"));
     		System.out.println(encrypt("5014971"));
 			System.out.println(encrypt("8239159"));
-			System.out.println(decrypt("QnoXWFHrPHv-p1h6CWB3yQ=="));
+			System.out.println(decrypt("QnoXWFHrPHv:p1h6CWB3yQ"));
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
