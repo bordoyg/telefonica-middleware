@@ -57,14 +57,7 @@ public class Agent_bindingImpl implements Agent_port_type{
 				JSONObject jsonBodyTOA=new JSONObject('{' + message.getBody() + '}');
 				String jsonRequestMemberRS=portalMiddlewareProperties.getProperty("memberResponsysService.body");
 				
-				jsonRequestMemberRS=jsonRequestMemberRS.replaceAll("@email@", jsonBodyTOA.getString("cemail"))
-						.replaceAll("@urlPortal@", createURLPortal(jsonBodyTOA.getInt("aid")))
-						.replaceAll("@mobileNumber@", jsonBodyTOA.getString("ccell"))
-						.replaceAll("@countryCode@", jsonBodyTOA.getString("country_code"))
-						.replaceAll("@fechaCita@", jsonBodyTOA.getString("route_date"))
-						.replaceAll("@franjaHoraria@", jsonBodyTOA.getString("activity_time_slot"))
-						.replaceAll("@nombre@", jsonBodyTOA.getString("activity_customer_name"))
-						.replaceAll("@nombreTecnico@", jsonBodyTOA.getString("resource_name"));
+				jsonRequestMemberRS=buildBodyRequest(jsonRequestMemberRS, jsonBodyTOA);
 				
 				String urlMember=portalMiddlewareProperties.getProperty("memberResponsysService.uri");
 				memberResponsysService.setUri(urlMember.replace("@listName@", contactList));
@@ -114,5 +107,17 @@ public class Agent_bindingImpl implements Agent_port_type{
 		String url=portalMiddlewareProperties.getProperty("portal.url");
 		String encriptedAid=Utils.encrypt(String.valueOf(aid));
 		return url + "?" + encriptedAid.replaceAll("=", "");
+	}
+	protected String buildBodyRequest(String jsonRequestMemberRS, JSONObject jsonBodyTOA)throws Exception {
+		jsonRequestMemberRS=jsonRequestMemberRS.replaceAll("@email@", jsonBodyTOA.getString("cemail"))
+				.replaceAll("@urlPortal@", createURLPortal(jsonBodyTOA.getInt("aid")))
+				.replaceAll("@mobileNumber@", jsonBodyTOA.getString("ccell"))
+				.replaceAll("@countryCode@", jsonBodyTOA.getString("country_code"))
+				.replaceAll("@fechaCita@", jsonBodyTOA.getString("route_date"))
+				.replaceAll("@franjaHoraria@", jsonBodyTOA.getString("activity_time_slot"))
+				.replaceAll("@nombre@", jsonBodyTOA.getString("activity_customer_name"))
+				.replaceAll("@nombreTecnico@", jsonBodyTOA.getString("resource_name"));
+		
+		return jsonRequestMemberRS;
 	}
 }
