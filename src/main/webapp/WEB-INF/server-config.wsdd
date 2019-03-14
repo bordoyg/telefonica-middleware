@@ -38,7 +38,7 @@
 		<ns1:parameter name="typeMappingVersion" value="1.2" />
 		<ns1:parameter name="wsdlPortType" value="agent_port_type" />
 		<ns1:parameter name="className"
-			value="agent.toatech.Agent_bindingSkeleton" />
+			value="co.etb.portalmiddleware.service.inbound.Agent_bindingSkeleton" />
 		<ns1:parameter name="wsdlServicePort" value="agent_interface" />
 		<ns1:parameter name="schemaQualified" value="urn:toatech:agent" />
 		<ns1:parameter name="wsdlTargetNamespace" value="urn:toatech:agent" />
