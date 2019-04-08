@@ -92,10 +92,10 @@ public abstract class BaseService {
 			}
 		}
 	}
-	public JSONObject service()throws Throwable{
+	public Object service()throws Throwable{
 		return this.service(null);
 	}
-	public JSONObject service(String requestEntity)throws Throwable{
+	public Object service(String requestEntity)throws Throwable{
 		CloseableHttpResponse response=null;
 		CloseableHttpClient httpClient=HttpClients.createDefault();
 		try{
@@ -151,7 +151,7 @@ public abstract class BaseService {
 			}catch(Throwable e){
 				try{
 					JSONArray jsonArray = new JSONArray(json);
-					return (JSONObject)jsonArray.get(0);
+					return jsonArray;
 				}catch(Throwable e2){
 					LOG.debug("La respuesta del servicio no es un Json, return null: " + json);
 				}

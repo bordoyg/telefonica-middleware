@@ -29,7 +29,7 @@ public class MiddleController extends BaseController {
 	public void renewTokenResponsys(){
 		LOG.debug("MiddleController renewTokenResponsys INICIO");
 		try {
-			JSONObject jsonObject=tokenResponsysService.service();
+			JSONObject jsonObject=(JSONObject)tokenResponsysService.service();
 			tokenResponsys=jsonObject.getString("authToken");
 			endpointResponsys=jsonObject.getString("endPoint");
 			
