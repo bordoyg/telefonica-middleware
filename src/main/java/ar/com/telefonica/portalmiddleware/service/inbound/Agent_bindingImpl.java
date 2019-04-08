@@ -114,6 +114,7 @@ public class Agent_bindingImpl extends agent.toatech.Agent_bindingImpl{
 	    String aid=document.getElementsByTagName("aid").item(0).getTextContent();
 	    String encriptedAid=Utils.encrypt(aid);
 	    String activityUrl=portalUrl + "?" + encriptedAid.replaceAll("=", "");
+	    LOG.debug("ID de la activodad= " + aid);
 	    LOG.debug("URL Portal= " + activityUrl);
 		StringBuilder sb=new StringBuilder();
 		sb.append(message.getBody());
