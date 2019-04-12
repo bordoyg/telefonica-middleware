@@ -75,11 +75,10 @@ public class Agent_bindingImpl implements Agent_port_type{
     	Map<String, List<Message_t>>mensajesAgrupados=new HashMap<String, List<Message_t>>();
     	Map<String, JSONArray>respuestasAgrupadas=new HashMap<String, JSONArray>();
     	for(int i=0; i<messages.length; i++){
-    		if(mensajesAgrupados.containsKey(messages[i].getSubject())){
-    			mensajesAgrupados.get(messages[i].getSubject()).add(messages[i]);
-    		}else{
+    		if(!mensajesAgrupados.containsKey(messages[i].getSubject())){
     			mensajesAgrupados.put(messages[i].getSubject(), new ArrayList<Message_t>());
     		}
+    		mensajesAgrupados.get(messages[i].getSubject()).add(messages[i]);
     	}
     	for(String subject:mensajesAgrupados.keySet()){
     		try{
@@ -122,6 +121,7 @@ public class Agent_bindingImpl implements Agent_port_type{
     		
     		LOG.debug("Response member service: " + record);
     	}
+    	int respIndex=0;
     	for(String subject: respuestasAgrupadas.keySet()){
     		for(int i=0; i<respuestasAgrupadas.get(subject).length(); i++){
         		Message_response_t respItem=new Message_response_t();
@@ -135,10 +135,10 @@ public class Agent_bindingImpl implements Agent_port_type{
         		}
         		
     			respItem.setMessage_id(mensajesAgrupados.get(subject).get(i).getMessage_id());
-    			responses[i]=respItem;
+    			responses[respIndex]=respItem;
+    			respIndex++;
         	}
     	}
-    	
     	
 		return responses;
 	}
