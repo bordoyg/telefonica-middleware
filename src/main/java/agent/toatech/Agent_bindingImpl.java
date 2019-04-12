@@ -11,7 +11,11 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.rmi.RemoteException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import org.apache.log4j.LogManager;
@@ -43,10 +47,7 @@ public class Agent_bindingImpl implements Agent_port_type{
     	LOG.debug("BEGIN send_message");
     	Message_response_t[] responses=new Message_response_t[messages.length];
     	
-    	String eventName=messages[0].getSubject();
     	String memberBodyItems=buildBodyMemberRequest(messages, responses);
-    	String eventBodyItems=buildBodyEventRequest(messages, responses);
-    	
     	JSONObject memberResponse=null;
     	try{
         	String urlMember=portalMiddlewareProperties.getProperty("memberResponsysService.uri");
@@ -70,31 +71,48 @@ public class Agent_bindingImpl implements Agent_port_type{
     	}
     	
     	JSONArray eventResponse=null;
-    	try{
-    		String urlEvent=portalMiddlewareProperties.getProperty("eventResponsysService.uri");
-    		eventResponsysService.setUri(urlEvent.replace("@eventName@", eventName));
-    		eventResponse=(JSONArray)eventResponsysService.service(new JSONObject(eventBodyItems).toString());
-    	}catch(Throwable t){
-    		for(int i=0; i<messages.length; i++){
-    			if(responses[i]==null){
-    				Message_response_t respItem=new Message_response_t();
-        			Message_t message=messages[i];
-    				respItem.setStatus(BaseService.STATUS_FAILED);
-    				respItem.setData(t.getMessage());
-    				respItem.setMessage_id(message.getMessage_id());
-    				responses[i]=respItem;
-    			}
+    	
+    	Map<String, List<Message_t>>mensajesAgrupados=new HashMap<String, List<Message_t>>();
+    	Map<String, JSONArray>respuestasAgrupadas=new HashMap<String, JSONArray>();
+    	for(int i=0; i<messages.length; i++){
+    		if(mensajesAgrupados.containsKey(messages[i].getSubject())){
+    			mensajesAgrupados.get(messages[i].getSubject()).add(messages[i]);
+    		}else{
+    			mensajesAgrupados.put(messages[i].getSubject(), new ArrayList<Message_t>());
     		}
-    		return responses;
     	}
+    	for(String subject:mensajesAgrupados.keySet()){
+    		try{
+        		String eventBodyItems=buildBodyEventRequest(mensajesAgrupados.get(subject), responses);
+            	String eventName=subject;
 
-		responses = processResponse(messages, memberResponse, eventResponse);
+        		String urlEvent=portalMiddlewareProperties.getProperty("eventResponsysService.uri");
+        		eventResponsysService.setUri(urlEvent.replace("@eventName@", eventName));
+        		eventResponse=(JSONArray)eventResponsysService.service(new JSONObject(eventBodyItems).toString());
+        		respuestasAgrupadas.put(subject, eventResponse);
+    		}catch(Throwable t){
+        		for(int i=0; i<messages.length; i++){
+        			if(responses[i]==null){
+        				Message_response_t respItem=new Message_response_t();
+            			Message_t message=messages[i];
+        				respItem.setStatus(BaseService.STATUS_FAILED);
+        				respItem.setData(t.getMessage());
+        				respItem.setMessage_id(message.getMessage_id());
+        				responses[i]=respItem;
+        			}
+        		}
+        		return responses;
+        	}
+    		
+    	}
+        	
+		responses = processResponse(mensajesAgrupados, memberResponse, respuestasAgrupadas);
 		LOG.debug("END send_message");
     	return responses;
     }
 	
 	
-    private Message_response_t[] processResponse(Message_t[] messages, JSONObject memberResponse, JSONArray eventResponse) {
+    private Message_response_t[] processResponse(Map<String, List<Message_t>> mensajesAgrupados, JSONObject memberResponse, Map<String, JSONArray>respuestasAgrupadas) {
     	
     	JSONArray records=memberResponse.getJSONObject("recordData").getJSONArray("records");
     	Message_response_t[] responses=new Message_response_t[records.length()];
@@ -104,19 +122,23 @@ public class Agent_bindingImpl implements Agent_port_type{
     		
     		LOG.debug("Response member service: " + record);
     	}
-    	for(int i=0; i<eventResponse.length(); i++){
-    		Message_response_t respItem=new Message_response_t();
-    		JSONObject eventItem=(JSONObject)eventResponse.get(i);
-    		
-    		if(eventItem!=null && !eventItem.has("success") || !eventItem.getBoolean("success")){
-    			respItem.setStatus(BaseService.STATUS_FAILED);
-    			respItem.setDescription(eventItem.getString("errorMessage"));
-    		}else{
-    			respItem.setStatus(BaseService.STATUS_SENT);
-    		}
-			respItem.setMessage_id(messages[i].getMessage_id());
-			responses[i]=respItem;
+    	for(String subject: respuestasAgrupadas.keySet()){
+    		for(int i=0; i<respuestasAgrupadas.get(subject).length(); i++){
+        		Message_response_t respItem=new Message_response_t();
+        		JSONObject eventItem=(JSONObject)respuestasAgrupadas.get(subject).get(i);
+        		
+        		if(eventItem!=null && !eventItem.has("success") || !eventItem.getBoolean("success")){
+        			respItem.setStatus(BaseService.STATUS_FAILED);
+        			respItem.setDescription(eventItem.getString("errorMessage"));
+        		}else{
+        			respItem.setStatus(BaseService.STATUS_SENT);
+        		}
+        		
+    			respItem.setMessage_id(mensajesAgrupados.get(subject).get(i).getMessage_id());
+    			responses[i]=respItem;
+        	}
     	}
+    	
     	
 		return responses;
 	}
@@ -171,14 +193,14 @@ public class Agent_bindingImpl implements Agent_port_type{
 		memberBodyItems.append(", ");
 		return memberBodyItems;
 	}
-	private String buildBodyEventRequest(Message_t[] messages, Message_response_t[] responses){
+	private String buildBodyEventRequest(List<Message_t> messages, Message_response_t[] responses){
 		String jsonRequestEventRS=portalMiddlewareProperties.getProperty("eventResponsysService.body");
 		String bodyItems=portalMiddlewareProperties.getProperty("eventResponsysService.body.items");
 		String folder=portalMiddlewareProperties.getProperty("repsonsys.folder");
 		
 		StringBuilder eventBodyItems=new StringBuilder();
-		for(int i=0; i<messages.length; i++){
-			Message_t message=messages[i];
+		for(int i=0; i<messages.size(); i++){
+			Message_t message=messages.get(i);
 			
 			LOG.debug("message_id: " + message.getMessage_id());
 			LOG.debug("subject: " + message.getSubject());
