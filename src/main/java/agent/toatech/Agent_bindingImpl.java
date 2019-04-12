@@ -14,9 +14,11 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -114,14 +116,13 @@ public class Agent_bindingImpl implements Agent_port_type{
     private Message_response_t[] processResponse(Map<String, List<Message_t>> mensajesAgrupados, JSONObject memberResponse, Map<String, JSONArray>respuestasAgrupadas) {
     	
     	JSONArray records=memberResponse.getJSONObject("recordData").getJSONArray("records");
-    	Message_response_t[] responses=new Message_response_t[records.length()];
+    	Set<Message_response_t> responses=new HashSet<Message_response_t>();
     	
     	for(int i=0; i<records.length(); i++){
     		String record=records.getJSONArray(i).getString(0);
     		
     		LOG.debug("Response member service: " + record);
     	}
-    	int respIndex=0;
     	for(String subject: respuestasAgrupadas.keySet()){
     		for(int i=0; i<respuestasAgrupadas.get(subject).length(); i++){
         		Message_response_t respItem=new Message_response_t();
@@ -135,12 +136,11 @@ public class Agent_bindingImpl implements Agent_port_type{
         		}
         		
     			respItem.setMessage_id(mensajesAgrupados.get(subject).get(i).getMessage_id());
-    			responses[respIndex]=respItem;
-    			respIndex++;
+    			responses.add(respItem);
         	}
     	}
     	
-		return responses;
+		return responses.toArray(new Message_response_t[responses.size()]);
 	}
 
 	private String createURLPortal(int aid) throws Exception {
