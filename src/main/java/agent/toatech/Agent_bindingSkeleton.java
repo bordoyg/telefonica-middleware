@@ -8,7 +8,7 @@
 package agent.toatech;
 
 public class Agent_bindingSkeleton implements agent.toatech.Agent_port_type, org.apache.axis.wsdl.Skeleton {
-    protected agent.toatech.Agent_port_type impl;
+    protected static agent.toatech.Agent_port_type impl;
     private static java.util.Map _myOperations = new java.util.Hashtable();
     private static java.util.Collection _myOperationsList = new java.util.ArrayList();
 
@@ -46,11 +46,13 @@ public class Agent_bindingSkeleton implements agent.toatech.Agent_port_type, org
     }
 
     public Agent_bindingSkeleton() {
-        this.impl = new agent.toatech.Agent_bindingImpl();
+    	if(impl==null){
+    		impl = new agent.toatech.Agent_bindingImpl();	
+    	}
     }
 
     protected Agent_bindingSkeleton(agent.toatech.Agent_port_type impl) {
-        this.impl = impl;
+    	Agent_bindingSkeleton.impl = impl;
     }
     public agent.toatech.Message_response_t[] send_message(agent.toatech.User_t user, agent.toatech.Message_t[] messages) throws java.rmi.RemoteException
     {
