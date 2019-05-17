@@ -46,9 +46,7 @@ public class Agent_bindingSkeleton implements agent.toatech.Agent_port_type, org
     }
 
     public Agent_bindingSkeleton() {
-    	if(impl==null){
-    		impl = new agent.toatech.Agent_bindingImpl();	
-    	}
+    	initImpl();
     }
 
     protected Agent_bindingSkeleton(agent.toatech.Agent_port_type impl) {
@@ -58,6 +56,11 @@ public class Agent_bindingSkeleton implements agent.toatech.Agent_port_type, org
     {
         agent.toatech.Message_response_t[] ret = impl.send_message(user, messages);
         return ret;
+    }
+    protected void initImpl(){
+    	if(impl==null){
+    		impl = new agent.toatech.Agent_bindingImpl();	
+    	}
     }
 
 }
