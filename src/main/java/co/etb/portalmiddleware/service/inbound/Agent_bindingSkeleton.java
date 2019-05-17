@@ -14,9 +14,10 @@ public class Agent_bindingSkeleton extends agent.toatech.Agent_bindingSkeleton {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public Agent_bindingSkeleton() {
+	@Override
+	protected void initImpl() {
 		if(impl==null){
-			impl = new Agent_bindingImpl();	
+			impl = new Agent_bindingImpl();
 		}
     }
 }

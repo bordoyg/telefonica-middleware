@@ -7,16 +7,29 @@
 
 package co.etb.portalmiddleware.service.inbound;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import org.json.JSONObject;
 
 public class Agent_bindingImpl extends agent.toatech.Agent_bindingImpl{
+	DateFormat dateFormatIn = new SimpleDateFormat("hh:mm");  
+	DateFormat dateFormatOut = new SimpleDateFormat("h:mm a");
 	@Override
 	protected StringBuilder replaceLabelsInBody(JSONObject jsonBodyTOA)throws Exception {
 		StringBuilder memberBodyItems=super.replaceLabelsInBody(jsonBodyTOA);
+		
+		Date dHourFrom=dateFormatIn.parse(jsonBodyTOA.getString("service_window_start"));
+		Date dHourTo=dateFormatIn.parse(jsonBodyTOA.getString("service_window_end"));
+		
+		String sHourFrom=dateFormatOut.format(dHourFrom);
+		String sHourTo=dateFormatOut.format(dHourTo);
+		
 		String result=memberBodyItems.toString().replaceAll("@appt_confirmed@", jsonBodyTOA.getString("appt_confirmed"))
 				.replaceAll("@appt_rescheduled@", jsonBodyTOA.getString("appt_rescheduled"))
-				.replaceAll("@service_window_start@", jsonBodyTOA.getString("service_window_start"))
-				.replaceAll("@service_window_end@", jsonBodyTOA.getString("service_window_end"));
+				.replaceAll("@service_window_start@", sHourFrom)
+				.replaceAll("@service_window_end@", sHourTo);
 		
 		return new StringBuilder(result);
 	}
