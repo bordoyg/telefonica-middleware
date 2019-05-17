@@ -44,7 +44,7 @@ public class Agent_bindingImpl implements Agent_port_type{
 		portalMiddlewareProperties = (Properties)ApplicationContextProvider.getApplicationContext().getBean("propertyConfigurer");
 		contactList=portalMiddlewareProperties.getProperty("repsonsys.contact-list");
 	}
-	public Message_response_t[] send_message(User_t user, Message_t[] messages) throws RemoteException {
+	public synchronized Message_response_t[] send_message(User_t user, Message_t[] messages) throws RemoteException {
     	
     	LOG.debug("BEGIN send_message");
     	Message_response_t[] responses=new Message_response_t[messages.length];
