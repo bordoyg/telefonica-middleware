@@ -63,7 +63,7 @@ public class Agent_bindingImpl extends agent.toatech.Agent_bindingImpl{
 
     }
     @Override
-	public Message_response_t[] send_message(User_t user, Message_t[] messages) throws RemoteException {
+	public synchronized Message_response_t[] send_message(User_t user, Message_t[] messages) throws RemoteException {
 		int i=0;
 
     	LOG.debug("INICIO send_message");
