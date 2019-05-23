@@ -40,7 +40,9 @@ public class Agent_bindingImpl extends agent.toatech.Agent_bindingImpl{
 	private DocumentBuilder builder;  
 	private Agent_port_type service=null;
 	private String portalUrl=null;
+	private String portalTecnicoUrl=null;
 	private static final String FAKE_FAILED_STATUS="fault";
+	private static final String EVENT_NAME_TECNICO_EN_CAMINO="SMART_COMUNICATION_ON_THE_WAY";
 	
     public Agent_bindingImpl() {
         super();
@@ -52,8 +54,10 @@ public class Agent_bindingImpl extends agent.toatech.Agent_bindingImpl{
 			ResourceBundle properties = ResourceBundle.getBundle("portal-middleware");
 			String jumpUrl=properties.getString("service.jump.url");
 			portalUrl=properties.getString("portal.url");
+			portalTecnicoUrl=properties.getString("portal.tecnico.url");
 			LOG.debug("url Jump: " + jumpUrl);
 			LOG.debug("url portal: " + portalUrl);
+			LOG.debug("url portal tecnico: " + portalTecnicoUrl);
 			URL url=new URL(jumpUrl);
 			Agent_serviceLocator serviceFactory=new Agent_serviceLocator();
 			service=serviceFactory.getagent_interface(url);
@@ -75,7 +79,11 @@ public class Agent_bindingImpl extends agent.toatech.Agent_bindingImpl{
 			Message_t message=messages[i];
 			try{
 				LOG.debug("Modificando mensaje: " + message.getMessage_id());
-				addDataToMessage(message, portalUrl);
+				if(EVENT_NAME_TECNICO_EN_CAMINO.equalsIgnoreCase(message.getSubject())){
+					addDataToMessage(message, portalTecnicoUrl);
+				}else{
+					addDataToMessage(message, portalUrl);	
+				}
 				Message_t[] messgs=new Message_t[1];
 				messgs[0]=message;
 				LOG.debug("Enviando mensaje: " + message.getMessage_id());
